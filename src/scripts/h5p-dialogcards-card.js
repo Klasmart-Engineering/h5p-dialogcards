@@ -186,6 +186,8 @@ class Card {
         classesRepetition = 'h5p-dialogcards-quick-progression';
         attributeTabindex = '0';
       }
+
+      $cardFooter.addClass('h5p-repetition');
     }
 
     this.$buttonTurn = H5P.JoubelUI.createButton({

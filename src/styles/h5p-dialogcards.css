@@ -334,7 +334,7 @@
   order: 1;
 }
 
-.h5p-dialogcards.h5p-landscape .h5p-joubelui-button.h5p-dialogcards-turn {
+.h5p-dialogcards.h5p-landscape .h5p-dialogcards-card-footer.h5p-repetition .h5p-joubelui-button.h5p-dialogcards-turn {
   width: 4em;
 }
 
@@ -343,7 +343,7 @@
   content: "\f021";
 }
 
-.h5p-dialogcards.h5p-landscape .h5p-dialogcards-turn:before {
+.h5p-dialogcards.h5p-landscape .h5p-dialogcards-card-footer.h5p-repetition .h5p-dialogcards-turn:before {
   padding-right: 0;
 }
 
@@ -405,11 +405,11 @@
   font-weight: normal;
 }
 
-.h5p-dialogcards.h5p-landscape .h5p-joubelui-button.h5p-dialogcards-answer-button.correct {
+.h5p-dialogcards.h5p-landscape .h5p-dialogcards-card-footer.h5p-repetition .h5p-joubelui-button.h5p-dialogcards-answer-button.correct {
   width: 4em;
 }
 
-.h5p-dialogcards.h5p-landscape .h5p-joubelui-button.h5p-dialogcards-answer-button.correct:before {
+.h5p-dialogcards.h5p-landscape .h5p-dialogcards-card-footer.h5p-repetition .h5p-joubelui-button.h5p-dialogcards-answer-button.correct:before {
   padding-right: 0;
 }
 
@@ -428,7 +428,7 @@
   order: 0;
 }
 
-.h5p-dialogcards.h5p-landscape .h5p-joubelui-button.h5p-dialogcards-answer-button.incorrect {
+.h5p-dialogcards.h5p-landscape .h5p-dialogcards-card-footer.h5p-repetition .h5p-joubelui-button.h5p-dialogcards-answer-button.incorrect {
   width: 4em;
 }
 
@@ -438,7 +438,7 @@
   font-weight: normal;
 }
 
-.h5p-dialogcards .h5p-joubelui-button.h5p-dialogcards-answer-button.incorrect:before {
+.h5p-dialogcards.h5p-landscape .h5p-dialogcards-card-footer.h5p-repetition .h5p-joubelui-button.h5p-dialogcards-answer-button.incorrect:before {
   padding-right: 0;
 }
 

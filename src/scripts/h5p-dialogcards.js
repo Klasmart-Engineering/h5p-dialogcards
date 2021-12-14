@@ -1078,9 +1078,11 @@ class Dialogcards extends H5P.EventDispatcher {
     }
 
     this.cards.forEach(card => {
-      card.$buttonTurn.text(window.orientation === 90 ? '' : this.params.answer);
-      card.$buttonCorrect.text(window.orientation === 90 ? '' : this.params.correctAnswer);
-      card.$buttonIncorrect.text(window.orientation === 90 ? '' : this.params.incorrectAnswer);
+      if (this.params.mode === 'repetition') {
+        card.$buttonTurn.text(window.orientation === 90 ? '' : this.params.answer);
+        card.$buttonCorrect.text(window.orientation === 90 ? '' : this.params.correctAnswer);
+        card.$buttonIncorrect.text(window.orientation === 90 ? '' : this.params.incorrectAnswer);
+      }
 
       if (window.orientation !== 90) {
         this.$cardwrapperSet.css('max-height', '');
