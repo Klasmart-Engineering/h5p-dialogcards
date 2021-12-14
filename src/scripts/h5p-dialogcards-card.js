@@ -397,54 +397,67 @@ class Card {
     // Reset text size
     $text.css('font-size', '');
 
-    // Measure container and text height
-    const currentTextContainerHeight = $textContainer.get(0).getBoundingClientRect().height;
-    let currentTextHeight = $text.get(0).getBoundingClientRect().height;
-    const parentFontSize = parseFloat($textContainer.css('font-size'));
-    let fontSize = parseFloat($text.css('font-size'));
+    if (window.orientation === 90) {
+      const textInner = this.getDOM().find('.h5p-dialogcards-card-text-inner').get(0);
 
-    const $inner = this.getDOM().closest('.h5p-container');
-    const mainFontSize = parseFloat($inner.css('font-size'));
-
-    // Decrease font size
-    if (currentTextHeight > currentTextContainerHeight) {
-      let decreaseFontSize = true;
-      while (decreaseFontSize) {
-
-        fontSize -= Card.SCALEINTERVAL;
-
-        if (fontSize < Card.MINSCALE) {
-          decreaseFontSize = false;
-          break;
-        }
-
-        $text.css('font-size', (fontSize / parentFontSize) + 'em');
-
-        currentTextHeight = $text.get(0).getBoundingClientRect().height;
-        if (currentTextHeight <= currentTextContainerHeight) {
-          decreaseFontSize = false;
+      if (textInner.clientHeight < textInner.scrollHeight) {
+        let fontSize = parseFloat($text.css('font-size'));
+        while (fontSize > Card.MINSCALE && textInner.clientHeight < textInner.scrollHeight) {
+          fontSize -= Card.SCALEINTERVAL;
+          $text.css('font-size', `${fontSize}px`);
         }
       }
-
     }
-    else { // Increase font size
-      let increaseFontSize = true;
-      while (increaseFontSize) {
-        fontSize += Card.SCALEINTERVAL;
+    else {
+      // Measure container and text height
+      const currentTextContainerHeight = $textContainer.get(0).getBoundingClientRect().height;
+      let currentTextHeight = $text.get(0).getBoundingClientRect().height;
+      const parentFontSize = parseFloat($textContainer.css('font-size'));
+      let fontSize = parseFloat($text.css('font-size'));
 
-        // Cap at  16px
-        if (fontSize > mainFontSize) {
-          increaseFontSize = false;
-          break;
+      const $inner = this.getDOM().closest('.h5p-container');
+      const mainFontSize = parseFloat($inner.css('font-size'));
+
+      // Decrease font size
+      if (currentTextHeight > currentTextContainerHeight) {
+        let decreaseFontSize = true;
+        while (decreaseFontSize) {
+
+          fontSize -= Card.SCALEINTERVAL;
+
+          if (fontSize < Card.MINSCALE) {
+            decreaseFontSize = false;
+            break;
+          }
+
+          $text.css('font-size', (fontSize / parentFontSize) + 'em');
+
+          currentTextHeight = $text.get(0).getBoundingClientRect().height;
+          if (currentTextHeight <= currentTextContainerHeight) {
+            decreaseFontSize = false;
+          }
         }
 
-        // Set relative font size to scale with full screen.
-        $text.css('font-size', fontSize / parentFontSize + 'em');
-        currentTextHeight = $text.get(0).getBoundingClientRect().height;
-        if (currentTextHeight >= currentTextContainerHeight) {
-          increaseFontSize = false;
-          fontSize = fontSize - Card.SCALEINTERVAL;
+      }
+      else { // Increase font size
+        let increaseFontSize = true;
+        while (increaseFontSize) {
+          fontSize += Card.SCALEINTERVAL;
+
+          // Cap at  16px
+          if (fontSize > mainFontSize) {
+            increaseFontSize = false;
+            break;
+          }
+
+          // Set relative font size to scale with full screen.
           $text.css('font-size', fontSize / parentFontSize + 'em');
+          currentTextHeight = $text.get(0).getBoundingClientRect().height;
+          if (currentTextHeight >= currentTextContainerHeight) {
+            increaseFontSize = false;
+            fontSize = fontSize - Card.SCALEINTERVAL;
+            $text.css('font-size', fontSize / parentFontSize + 'em');
+          }
         }
       }
     }

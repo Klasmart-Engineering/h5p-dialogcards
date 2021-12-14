@@ -130,6 +130,18 @@ class Dialogcards extends H5P.EventDispatcher {
     this.round = 0; // 0 indicates that DOM needs to be set up
     this.results = this.previousState.results || [];
 
+    // Workaround for iOS
+    if (screen.orientation) {
+      screen.orientation.addEventListener('change', () => {
+        this.handleOrientationChange();
+      });
+    }
+    else {
+      window.addEventListener('orientationchange', () => {
+        this.handleOrientationChange();
+      });
+    }
+
     /**
      * Attach h5p inside the given container.
      *
@@ -736,30 +748,71 @@ class Dialogcards extends H5P.EventDispatcher {
      * Update the dimensions of the task when resizing the task.
      */
     this.resize = () => {
+      this.handleOrientationChange();
+
+      let displayLimits = null;
+
+      // Change landscape layout on mobile
+      if (
+        typeof window.orientation === 'number' &&
+        this.$cardwrapperSet.find('.h5p-dialogcards-summary-screen').hasClass('h5p-dialogcards-gone') &&
+        this.params.behaviour.scaleTextNotCard
+      ) {
+        this.$inner.toggleClass('h5p-landscape', window.orientation === 90);
+
+        if (window.orientation === 90) {
+          displayLimits = this.computeDisplayLimits();
+          if (displayLimits?.height) {
+            this.$cardwrapperSet.css('max-height', `${displayLimits.height / 2}px`);
+          }
+          else {
+            this.$cardwrapperSet.css('max-height', '');
+          }
+        }
+      }
+      else {
+        this.$cardwrapperSet.css('max-height', '');
+      }
+
       let maxHeight = 0;
-      this.updateImageSize();
+
+      if (!displayLimits || window.orientation !== 90 || !this.params.behaviour.scaleTextNotCard) {
+        this.updateImageSize();
+      }
+      else {
+        this.cards.forEach(card => {
+          card.setImageHeight('');
+        });
+      }
+
       if (!this.params.behaviour.scaleTextNotCard && this.cardsShown !== false) {
         this.determineCardSizes();
       }
 
-      // Reset card-wrapper-set height
-      this.$cardwrapperSet.css('height', 'auto');
+      if (!this.params.behaviour.scaleTextNotCard || window.orientation !== 90 || !displayLimits?.height || !this.$cardwrapperSet.find('.h5p-dialogcards-summary-screen').hasClass('h5p-dialogcards-gone')) {
+        // Reset card-wrapper-set height
+        this.$cardwrapperSet.css('height', 'auto');
 
-      //Find max required height for all cards
-      this.$cardwrapperSet.children(':not(.h5p-dialogcards-gone)').each( function () {
-        const wrapperHeight = $(this).css('height', 'initial').outerHeight();
-        $(this).css('height', 'inherit');
-        maxHeight = wrapperHeight > maxHeight ? wrapperHeight : maxHeight;
+        // Find max required height for all cards
+        this.$cardwrapperSet.children(':not(.h5p-dialogcards-gone)').each( function () {
+          const wrapperHeight = $(this).css('height', 'initial').outerHeight();
+          $(this).css('height', 'inherit');
+          maxHeight = Math.max(wrapperHeight, maxHeight);
 
-        // Check height
-        if (!$(this).next('.h5p-dialogcards-cardwrap').length) {
-          const initialHeight = $(this).find('.h5p-dialogcards-cardholder').css('height', 'initial').outerHeight();
-          maxHeight = initialHeight > maxHeight ? initialHeight : maxHeight;
-          $(this).find('.h5p-dialogcards-cardholder').css('height', 'inherit');
-        }
-      });
-      const relativeMaxHeight = maxHeight / parseFloat(this.$cardwrapperSet.css('font-size'));
-      this.$cardwrapperSet.css('height', relativeMaxHeight + 'em');
+          // Check height
+          if (!$(this).next('.h5p-dialogcards-cardwrap').length) {
+            const initialHeight = $(this).find('.h5p-dialogcards-cardholder').css('height', 'initial').outerHeight();
+            maxHeight = Math.max(initialHeight, maxHeight);
+            $(this).find('.h5p-dialogcards-cardholder').css('height', 'inherit');
+          }
+        });
+        const relativeMaxHeight = maxHeight / parseFloat(this.$cardwrapperSet.css('font-size'));
+        this.$cardwrapperSet.css('height', relativeMaxHeight + 'em');
+      }
+      else {
+        this.$cardwrapperSet.css('height', `${displayLimits?.height / 2}px`);
+      }
+
       this.scaleToFitHeight();
       this.truncateRetryButton();
 
@@ -951,6 +1004,88 @@ class Dialogcards extends H5P.EventDispatcher {
         results: this.results
       };
     };
+  }
+
+  /**
+   * Compute display limits.
+   * @return {object|null} Height and width in px or null if cannot be determined.
+   */
+  computeDisplayLimits() {
+    let topWindow = this.getTopWindow();
+
+    // iOS doesn't change screen dimensions on rotation
+    let screenSize = (this.isIOS() && window.orientation === 90) ?
+      { height: screen.width, width: screen.height } :
+      { height: screen.height, width: screen.width };
+
+    topWindow = topWindow || {
+      innerHeight: screenSize.height,
+      innerWidth: screenSize.width
+    };
+
+    // Smallest value of viewport and container wins
+    return {
+      height: Math.min(topWindow.innerHeight, screenSize.height),
+      width: Math.min(topWindow.innerWidth, this.$inner.get(0).offsetWidth)
+    };
+  }
+
+  /**
+   * Detect whether user is running iOS.
+   * @return {boolean} True, if user is running iOS.
+   */
+  isIOS() {
+    return (
+      ['iPad Simulator', 'iPhone Simulator', 'iPod Simulator', 'iPad', 'iPhone', 'iPod'].includes(navigator.platform) ||
+      (navigator.userAgent.includes('Mac') && 'ontouchend' in document)
+    );
+  }
+
+  /**
+	 * Get top DOM Window object.
+	 * @param {Window} [startWindow=window] Window to start looking from.
+	 * @return {Window|null} Top window.
+	 */
+  getTopWindow(startWindow) {
+    var sameOrigin;
+    startWindow = startWindow || window;
+
+    // H5P iframe may be on different domain than iframe content
+    try {
+      sameOrigin = startWindow.parent.location.host === window.location.host;
+    }
+    catch (error) {
+      sameOrigin = null;
+    }
+
+    if (!sameOrigin) {
+      return null;
+    }
+
+    if (startWindow.parent === startWindow || ! startWindow.parent) {
+      return startWindow;
+    }
+
+    return this.getTopWindow(startWindow.parent);
+  }
+
+  /**
+   * Handle orientation change.
+   */
+  handleOrientationChange() {
+    if (!this.params.behaviour.scaleTextNotCard) {
+      return;
+    }
+
+    this.cards.forEach(card => {
+      card.$buttonTurn.text(window.orientation === 90 ? '' : this.params.answer);
+      card.$buttonCorrect.text(window.orientation === 90 ? '' : this.params.correctAnswer);
+      card.$buttonIncorrect.text(window.orientation === 90 ? '' : this.params.incorrectAnswer);
+
+      if (window.orientation !== 90) {
+        this.$cardwrapperSet.css('max-height', '');
+      }
+    });
   }
 }
 
