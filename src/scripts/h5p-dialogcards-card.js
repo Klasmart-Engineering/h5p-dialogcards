@@ -11,7 +11,7 @@ class Card {
    * @param {function} [callbacks.onCardSize] Call when card needs resize.
    * @param {function} [callbacks.onCardTurned] Call when card was turned.
    */
-  constructor(card, params, id, contentId, callbacks={}) {
+  constructor(card, params, id, contentId, callbacks = {}) {
     this.card = card;
     this.params = params || {};
     this.id = id;
@@ -29,7 +29,7 @@ class Card {
     }
 
     this.audios = {};
-    this.$audioWrappers = {}
+    this.$audioWrappers = {};
 
     this.$cardWrapper = $('<div>', {
       'class': 'h5p-dialogcards-cardwrap',
@@ -37,7 +37,7 @@ class Card {
       'tabindex': '-1'
     });
     if (this.params.mode !== 'repetition') {
-      this.$cardWrapper.attr('aria-labelledby', 'h5p-dialogcards-progress-' + H5P.Dialogcards.idCounter)
+      this.$cardWrapper.attr('aria-labelledby', 'h5p-dialogcards-progress-' + H5P.Dialogcards.idCounter);
     }
 
     this.$cardHolder = $('<div>', {'class': 'h5p-dialogcards-cardholder'})
@@ -314,7 +314,7 @@ class Card {
       // Image shown/hidden via CSS
 
       // Audio buttons shown/hidden via CSS
-      this.stopAudio()
+      this.stopAudio();
 
       // Toggle state for knowledge confirmation buttons
       if (this.params.mode === 'repetition' && !this.params.behaviour.quickProgression) {
@@ -369,7 +369,7 @@ class Card {
       .replace('@card', (position).toString())
       .replace('@total', (total).toString());
 
-    this.$cardWrapper.attr('aria-label', progressText)
+    this.$cardWrapper.attr('aria-label', progressText);
   }
 
   /**
@@ -443,7 +443,7 @@ class Card {
         currentTextHeight = $text.get(0).getBoundingClientRect().height;
         if (currentTextHeight >= currentTextContainerHeight) {
           increaseFontSize = false;
-          fontSize = fontSize- Card.SCALEINTERVAL;
+          fontSize = fontSize - Card.SCALEINTERVAL;
           $text.css('font-size', fontSize / parentFontSize + 'em');
         }
       }
@@ -494,7 +494,7 @@ class Card {
       // Wait for transition, then set focus
       const $card = this.getDOM();
       $card.one('transitionend', () => {
-        $card.focus()
+        $card.focus();
       });
     }
   }
