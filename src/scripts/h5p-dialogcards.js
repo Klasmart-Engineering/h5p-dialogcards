@@ -153,6 +153,11 @@ class Dialogcards extends H5P.EventDispatcher {
         $container.addClass('h5p-text-scaling');
       }
 
+      // KidsLoop customization to prevent dragging the image
+      this.$inner.get(0).addEventListener('dragstart', function (event) {
+        event.preventDefault();
+      });
+
       // Only pass what's necessary
       const managerParams = {
         mode: this.params.mode,

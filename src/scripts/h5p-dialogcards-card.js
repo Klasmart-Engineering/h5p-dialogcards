@@ -118,6 +118,25 @@ class Card {
       $image = $('<img class="h5p-dialogcards-image" src="' + H5P.getPath(card[side].image.path, this.contentId) + '"/>');
       $image.addClass(`h5p-dialogcards-image-${side}`);
 
+      // KidsLoop customization to prevent dragging the image
+      $image.get(0).addEventListener('dragstart', function (event) {
+        event.preventDefault();
+      });
+      /*
+       * KidsLoop customization to prevent saving images on Android. Cannot
+       * use CSS `pointer-events: none`, because it interferes with dragstart
+       */
+      $image.get(0).addEventListener('contextmenu', function (event) {
+        event.preventDefault();
+        return false;
+      });
+      // KidsLoop customization to prevent dragging the image on iOS
+      $image.css({
+        'user-select': 'none',
+        '-webkit-user-select': 'none',
+        '-webkit-touch-callout': 'none'
+      });
+
       if (card[side].imageAltText) {
         $image.attr('alt', card[side].imageAltText);
       }
