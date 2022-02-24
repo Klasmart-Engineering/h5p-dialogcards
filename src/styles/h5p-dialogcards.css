@@ -21,6 +21,7 @@
 .h5p-dialogcards {
   overflow: hidden;
   position: relative;
+  font-family: 'Roboto', sans-serif;
 }
 
 .h5p-no-frame .h5p-dialogcards .h5p-dialogcards-title,
