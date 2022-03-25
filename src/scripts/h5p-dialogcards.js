@@ -836,8 +836,13 @@ class Dialogcards extends H5P.EventDispatcher {
             $(this).find('.h5p-dialogcards-cardholder').css('height', 'inherit');
           }
         });
-        const relativeMaxHeight = maxHeight / parseFloat(this.$cardwrapperSet.css('font-size'));
-        this.$cardwrapperSet.css('height', relativeMaxHeight + 'em');
+
+        /*
+         * The original implementation used relative heights in em, but
+         * within the KidsLoop app, the webview disrespects the font size
+         * that is specified.
+         */
+        this.$cardwrapperSet.css('height', `${maxHeight}px`);
       }
       else {
         if (displayLimits?.height - nonCardHeight > 1) {
