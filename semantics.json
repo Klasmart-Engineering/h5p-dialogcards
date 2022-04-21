@@ -67,6 +67,7 @@
       "type": "group",
       "label": "Question",
       "importance": "high",
+      "isSubContent": true,
       "fields": [
         {
           "name": "front",
