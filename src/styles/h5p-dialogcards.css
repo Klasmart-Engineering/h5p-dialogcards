@@ -420,7 +420,8 @@
   text-decoration: none solid rgb(31, 130, 76);
 }
 
-.h5p-dialogcards .h5p-joubelui-button.h5p-dialogcards-answer-button.correct.h5p-dialogcards-quick-progression:hover {
+.h5p-dialogcards .h5p-joubelui-button.h5p-dialogcards-answer-button.correct.h5p-dialogcards-quick-progression:hover,
+.h5p-dialogcards .h5p-joubelui-button.h5p-dialogcards-answer-button.correct.selected {
   color: #fff;
   background-color: #1f824c;
 }
@@ -449,7 +450,8 @@
   text-decoration: none solid rgb(217, 83, 84);
 }
 
-.h5p-dialogcards .h5p-joubelui-button.h5p-dialogcards-answer-button.incorrect.h5p-dialogcards-quick-progression:hover {
+.h5p-dialogcards .h5p-joubelui-button.h5p-dialogcards-answer-button.incorrect.h5p-dialogcards-quick-progression:hover,
+.h5p-dialogcards .h5p-joubelui-button.h5p-dialogcards-answer-button.incorrect.selected {
   color: #fff;
   background-color: #d95354;
 }

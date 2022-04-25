@@ -553,14 +553,39 @@ class Dialogcards extends H5P.EventDispatcher {
      * @param {object} [result] Optional result of repetition mode.
      */
     this.nextCard = (result) => {
+      const currentId = this.getCurrentSelectionIndex()
+
       if (typeof(result) !== 'undefined') {
         this.results.push(result);
+
+        // Emit screenshot
+        if (H5P && H5P.KLScreenshot) {
+          // Make hover hightlight permanent for screenshot
+          this.cards[this.currentCardId].highlightButton(result.result ? 'correct' : 'incorrect', true);
+
+          H5P.KLScreenshot.takeScreenshot(
+            {
+              subContentId: this.params.dialogs[currentId].front.subContentId,
+              getTitle: () => {
+                return this.params.progressText
+                  .replace('@card', currentId + 1)
+                  .replace('@total', this.params.dialogs.length);
+              },
+              trigger: this.trigger
+            },
+            this.$inner.get(0)
+          );
+        }
       }
+
+      // Remove hover hightlight that was required for for screenshot
+      this.cards[this.currentCardId].highlightButton('correct', false);
+      this.cards[this.currentCardId].highlightButton('incorrect', false);
 
       this.cards[this.currentCardId].stopAudio();
 
       // On final card
-      if (this.cardIds.length - this.getCurrentSelectionIndex() === 1) {
+      if (this.cardIds.length - currentId === 1) {
         if (this.params.mode === 'repetition') {
           this.$progress.text(this.params.cardsLeft.replace('@number', 0));
           this.cards[this.currentCardId].showSummaryButton(this.showSummary);
@@ -568,7 +593,7 @@ class Dialogcards extends H5P.EventDispatcher {
         return;
       }
 
-      this.gotoCard(this.getCurrentSelectionIndex() + 1);
+      this.gotoCard(currentId + 1);
     };
 
     /**

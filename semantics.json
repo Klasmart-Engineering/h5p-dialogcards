@@ -67,7 +67,6 @@
       "type": "group",
       "label": "Question",
       "importance": "high",
-      "isSubContent": true,
       "fields": [
         {
           "name": "front",
@@ -75,6 +74,7 @@
           "label": "Front",
           "importance": "medium",
           "expanded": true,
+          "isSubContent": true,
           "fields": [
             {
               "name": "text",

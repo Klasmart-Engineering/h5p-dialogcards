@@ -239,6 +239,27 @@ class Card {
   }
 
   /**
+   * Highlight one of the buttons.
+   * @param {string} id 'correct' of 'incorrect'.
+   * @param {boolean} state True will highlight, false will unhighlight.
+   */
+  highlightButton(id, state) {
+    if ((id !== 'correct' && id !== 'incorrect') || typeof state !== 'boolean') {
+      return;
+    }
+
+    if (id === 'correct' && this.$buttonCorrect) {
+      this.$buttonCorrect.toggleClass('selected', state);
+      return;
+    }
+
+    if (id === 'incorrect' && this.$buttonIncorrect) {
+      this.$buttonIncorrect.toggleClass('selected', state);
+      return;
+    }
+  }
+
+  /**
    * Create button listeners.
    * Will be lost when the element is removed from DOM.
    */
