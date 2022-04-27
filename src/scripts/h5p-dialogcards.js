@@ -553,23 +553,77 @@ class Dialogcards extends H5P.EventDispatcher {
      * @param {object} [result] Optional result of repetition mode.
      */
     this.nextCard = (result) => {
-      const currentId = this.getCurrentSelectionIndex()
+      const currentCard = this.cards[this.currentCardId];
 
       if (typeof(result) !== 'undefined') {
         this.results.push(result);
 
+        const title = this.params.progressText
+          .replace('@card', this.currentCardId + 1)
+          .replace('@total', this.params.dialogs.length);
+
+        const description = currentCard.card.front.text || currentCard.card.front?.image?.imageAlt;
+
+        const fakeSubContentInstance = {
+          contentId: this.contentId,
+          subContentId: currentCard.card.front.subContentId,
+          libraryInfo: {
+            versionedNameNoSpaces: `H5P.DialogcardsCard-${this.libraryInfo.majorVersion}.${this.libraryInfo.minorVersion}`
+          },
+          parent: this,
+          getTitle: () => {
+            return title;
+          },
+          getScore: () => {
+            return result.result ? 1 : 0;
+          },
+          getMaxScore: () => {
+            return 1;
+          },
+          xAPIDefinition: {
+            interactionType: 'true-false',
+            description: `${title}${description ? ': ' + description : ''}`,
+            name: title,
+            correctResponsesPattern: ['true'],
+            type: 'http://adlnet.gov/expapi/activities/cmi.interaction'
+          },
+          xAPIResult: {
+            response: result.result.toString()
+          }
+        }
+
+        const xAPIEvent = this.createXAPIEventTemplate('answered');
+
+        xAPIEvent.setContext(fakeSubContentInstance);
+
+        xAPIEvent.setObject(fakeSubContentInstance);
+        for (let prop in fakeSubContentInstance.xAPIDefinition) {
+          xAPIEvent.data.statement.object.definition[prop] = fakeSubContentInstance.xAPIDefinition[prop];
+        }
+
+        xAPIEvent.setScoredResult(
+          fakeSubContentInstance.getScore(),
+          fakeSubContentInstance.getMaxScore(),
+          fakeSubContentInstance,
+          true,
+          fakeSubContentInstance.getScore() === fakeSubContentInstance.getMaxScore()
+        );
+        for (let prop in fakeSubContentInstance.xAPIResult) {
+          xAPIEvent.data.statement.result[prop] = fakeSubContentInstance.xAPIResult[prop];
+        }
+
+        this.trigger(xAPIEvent);
+
         // Emit screenshot
         if (H5P && H5P.KLScreenshot) {
           // Make hover hightlight permanent for screenshot
-          this.cards[this.currentCardId].highlightButton(result.result ? 'correct' : 'incorrect', true);
+          currentCard.highlightButton(result.result ? 'correct' : 'incorrect', true);
 
           H5P.KLScreenshot.takeScreenshot(
             {
-              subContentId: this.params.dialogs[currentId].front.subContentId,
+              subContentId: currentCard.card.front.subContentId,
               getTitle: () => {
-                return this.params.progressText
-                  .replace('@card', currentId + 1)
-                  .replace('@total', this.params.dialogs.length);
+                return title;
               },
               trigger: this.trigger
             },
@@ -579,21 +633,21 @@ class Dialogcards extends H5P.EventDispatcher {
       }
 
       // Remove hover hightlight that was required for for screenshot
-      this.cards[this.currentCardId].highlightButton('correct', false);
-      this.cards[this.currentCardId].highlightButton('incorrect', false);
+      currentCard.highlightButton('correct', false);
+      currentCard.highlightButton('incorrect', false);
 
-      this.cards[this.currentCardId].stopAudio();
+      currentCard.stopAudio();
 
       // On final card
-      if (this.cardIds.length - currentId === 1) {
+      if (this.cardIds.length - this.currentCardId === 1) {
         if (this.params.mode === 'repetition') {
           this.$progress.text(this.params.cardsLeft.replace('@number', 0));
-          this.cards[this.currentCardId].showSummaryButton(this.showSummary);
+          currentCard.showSummaryButton(this.showSummary);
         }
         return;
       }
 
-      this.gotoCard(currentId + 1);
+      this.gotoCard(this.currentCardId + 1);
     };
 
     /**
